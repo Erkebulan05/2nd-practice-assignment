@@ -1,53 +1,80 @@
 #include <iostream>
 #include <string>
+
 using namespace std;
-    string encryptVigenere(const string& plaintext, const string& keyword) {
-    string ciphertext;
-    int keywordLength = keyword.length();
-    int plaintextLength = plaintext.length();
 
-    for (int i = 0; i < plaintextLength; ++i) {
-        char plainChar = plaintext[i];
-        char keywordChar = keyword[i % keywordLength]; // повторяем ключевое слово
+string vigenere_cipher(string message, string key) {
+  int key_index = 0;
+  string ciphertext;
 
-        // Преобразование символов в верхний регистр
-        plainChar = toupper(plainChar);
-        keywordChar = toupper(keywordChar);
+  for (char c : message) {
+    // Find the corresponding character in the key
+    char key_char = key[key_index];
 
-        if (isalpha(plainChar)) {
-            // Приводим символы к значениям от 0 до 25 (A=0, B=1, и т.д.)
-            plainChar -= 'A';
-            keywordChar -= 'A';
+    // Encrypt the character using the key character
+    int shift = key_char - 'a';
+    char encrypted_char = (c - 'a' + shift) % 26 + 'a';
 
-            // Шифрование символа
-            char encryptedChar = (plainChar + keywordChar) % 26;
+    // Append the encrypted character to the ciphertext
+    ciphertext += encrypted_char;
 
-            // Преобразование обратно в символы ASCII
-            encryptedChar += 'A';
+    // Increment the key index
+    key_index++;
 
-            ciphertext += encryptedChar;
-        } else {
-            // Если символ не является буквой, просто добавляем его к зашифрованному тексту без изменений
-            ciphertext += plainChar;
-        }
+    // If the key index is greater than or equal to the length of the key, reset it to 0
+    if (key_index >= key.length()) {
+      key_index = 0;
     }
+  }
 
-    return ciphertext;
+  return ciphertext;
+}
+
+string vigenere_decrypt(string ciphertext, string key) {
+  int key_index = 0;
+  string plaintext;
+
+  for (char c : ciphertext) {
+    // Find the corresponding character in the key
+    char key_char = key[key_index];
+
+    // Decrypt the character using the key character
+    int shift = 26 - (key_char - 'a');
+    char decrypted_char = (c - 'a' + shift) % 26 + 'a';
+
+    // Append the decrypted character to the plaintext
+    plaintext += decrypted_char;
+
+    // Increment the key index
+    key_index++;
+
+    // If the key index is greater than or equal to the length of the key, reset it to 0
+    if (key_index >= key.length()) {
+      key_index = 0;
+    }
+  }
+
+  return plaintext;
 }
 
 int main() {
-    string plaintext;
-    string keyword;
+  string message;
+  string key;
 
-    cout << "Введите текст для шифрования: ";
-    getline(cin, plaintext);
+  // Input the message and key from the user
+  cout << "Enter the message: ";
+  getline(cin, message);
 
-    cout << "Введите ключевое слово: ";
-    getline(cin, keyword);
+  cout << "Enter the key: ";
+  getline(cin, key);
 
-    string ciphertext = encryptVigenere(plaintext, keyword);
+  // Encrypt the message
+  string ciphertext = vigenere_cipher(message, key);
+  cout << "Ciphertext: " << ciphertext << endl;
 
-    cout << "Зашифрованный текст: " << ciphertext << std::endl;
+  // Decrypt the ciphertext
+  string plaintext = vigenere_decrypt(ciphertext, key);
+  cout << "Plaintext: " << plaintext << endl;
 
-    return 0;
+  return 0;
 }
